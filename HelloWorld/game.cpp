@@ -2,15 +2,16 @@
 #define PLAY_USING_GAMEOBJECT_MANAGER
 #include "Play.h"
 #include "game.h"
+#include "paddle.h"
 
-
-
+//creates ball object 
 void SpawnBall() {
 	const int objectID = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH /  2, DISPLAY_HEIGHT-360 }, 4, "ball");
 	GameObject& ball = Play::GetGameObject(objectID);
 	ball.velocity = normalize({ 1,1 }) * ballSpeed;
 }
 
+//creates brick objects and lays out obs in game
 void SetUpScene()
 {
 	for (int x = 5; x < DISPLAY_WIDTH-20; x+=17) {
@@ -22,6 +23,13 @@ void SetUpScene()
 	
 }
 
+//bool willBounce(const Paddle paddle, const  GameObject brick) {
+
+//}
+
+
+//global var from Paddle struct
+Paddle pad;
 
 
 void StepFrame(float elapsedTime) {
@@ -30,10 +38,10 @@ void StepFrame(float elapsedTime) {
 	for (int ball: ballIDs) {
 		GameObject& currentBall = Play::GetGameObject(ball);
 		Play::UpdateGameObject(currentBall);
-		if (currentBall.pos.x > DISPLAY_WIDTH-5 || currentBall.pos.x<0) {
+		if (currentBall.pos.x > DISPLAY_WIDTH-5) {
 			currentBall.velocity.x = currentBall.velocity.x*(-1);
 		}
-		if (currentBall.pos.y > DISPLAY_HEIGHT-5 || currentBall.pos.y < 0) {
+		if (currentBall.pos.y > DISPLAY_HEIGHT-5) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
 		}
 		Play::DrawObject(currentBall);
@@ -52,8 +60,15 @@ void StepFrame(float elapsedTime) {
 				Play::DrawObject(currentBrick);
 			}
 		}
-
+		
 	}
+	if (Play::KeyDown(Play::KEY_LEFT)) {
+		updatePaddle(pad, -3.0);
+	}
+	if (Play::KeyDown(Play::KEY_RIGHT)) {
+		updatePaddle(pad, 3.0);
+	}
+	DrawPaddle(pad);
 }
 
 
