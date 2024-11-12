@@ -14,10 +14,9 @@ void SpawnBall() {
 void SetUpScene()
 {
 	for (int x = 5; x < DISPLAY_WIDTH-20; x+=17) {
-		for (int y = 340; y > DISPLAY_HEIGHT-160 ;y-=11) {
+		for (int y = DISPLAY_HEIGHT - 20; y > DISPLAY_HEIGHT-160 ;y-=11) {
 			const int brickID = Play::CreateGameObject(ObjectType::TYPE_BRICK, { x,y }, 6, "brick");
 			GameObject& brick = Play::GetGameObject(brickID);
-			Play::DrawObject(brick);
 		}
 	}
 	
@@ -46,8 +45,8 @@ void StepFrame(float elapsedTime) {
 			GameObject& currentBall = Play::GetGameObject(ball);
 			if (Play::IsColliding(currentBall, currentBrick)) {
 				Play::DestroyGameObject(currentBrick.GetId());
-				currentBall.velocity.x = currentBall.velocity.x * (-1);
-				currentBall.velocity.y = currentBall.velocity.y * (-1);
+				currentBall.velocity *= (-1);
+			
 			}
 			else {
 				Play::DrawObject(currentBrick);
