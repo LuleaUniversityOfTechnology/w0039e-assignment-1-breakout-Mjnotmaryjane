@@ -10,9 +10,9 @@ Paddle pad;
 
 //creates ball object 
 void SpawnBall() {
-	const int objectID = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH /  2, DISPLAY_HEIGHT-300 }, 4, "ball");
+	const int objectID = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH /  2, DISPLAY_HEIGHT-200 }, 4, "ball");
 	GameObject& ball = Play::GetGameObject(objectID);
-	ball.velocity = normalize({ 1,1 }) * ballSpeed;
+	ball.velocity = normalize({ 1,-1 }) * ballSpeed;
 }
 
 //creates brick objects and lays out obs in game
@@ -28,7 +28,7 @@ void SetUpScene()
 }
 
 
-
+//function to check for collision between ball and paddle by calculatind delta x and y 
 bool willBounce(const Paddle& paddle, const Play::GameObject& ball) {
 	const float topLeftX = paddle.Pos.x;
 	const float topLeftY = paddle.Pos.y+10;

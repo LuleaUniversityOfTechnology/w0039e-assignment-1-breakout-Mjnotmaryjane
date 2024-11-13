@@ -13,4 +13,5 @@ void StepFrame(float timeElapsed);
 //creates brick objects and lays out obs in game
 void SetUpScene();
 
+//function to check for collision between ball and paddle by calculatind delta x and y 
 bool willBounce(const Paddle& paddle, const Play::GameObject& ball);
