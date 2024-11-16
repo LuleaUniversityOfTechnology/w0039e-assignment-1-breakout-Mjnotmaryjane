@@ -5,7 +5,7 @@
 //creates a paddle from the draw rect play.h fucntion.
 void DrawPaddle(const Paddle& paddle) {
 	Play::Point2D bottomLeft = {paddle.Pos.x, paddle.Pos.y };
-	Play::Point2D topRight = { paddle.Pos.x + 30, paddle.Pos.y + 10 };
+	Play::Point2D topRight = { paddle.Pos.x + 110, paddle.Pos.y + 10 };
 	Play::DrawRect(bottomLeft, topRight, Play::cMagenta, true);
 }
 

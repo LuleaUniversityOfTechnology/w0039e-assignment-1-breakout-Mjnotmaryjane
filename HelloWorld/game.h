@@ -15,3 +15,7 @@ void SetUpScene();
 
 //function to check for collision between ball and paddle by calculatind delta x and y 
 bool willBounce(const Paddle& paddle, const Play::GameObject& ball);
+
+//Keeps track of high scores in game. 
+//uses stack array.
+void HighScores();

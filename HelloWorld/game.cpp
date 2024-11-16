@@ -8,6 +8,23 @@
 //global var from Paddle struct
 Paddle pad;
 
+//global var for current player score
+unsigned int CurrentScore;
+
+void HighScores() {
+	unsigned int stackArray[5] = { 7,3,5,2,6 };
+	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
+	int displayDecrement=260;
+	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 240), "High Scores: ");
+	for (int i = 0; i < 5; i++) {
+		std::string Score = std::to_string(stackArray[i]);
+		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - displayDecrement), Score.c_str());
+		displayDecrement += 20;
+
+	}
+
+}
+
 //creates ball object 
 void SpawnBall() {
 	const int objectID = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH /  2, DISPLAY_HEIGHT-200 }, 4, "ball");
@@ -32,7 +49,7 @@ void SetUpScene()
 bool willBounce(const Paddle& paddle, const Play::GameObject& ball) {
 	const float topLeftX = paddle.Pos.x;
 	const float topLeftY = paddle.Pos.y+10;
-	const float bottomRightX = paddle.Pos.x+30;
+	const float bottomRightX = paddle.Pos.x+110;
 	const float bottomRightY = paddle.Pos.y;
 	const float dx = ball.pos.x - std::max(topLeftX, std::min(ball.pos.x, bottomRightX));
 	const float dy = ball.pos.y - std::max(topLeftY, std::min(ball.pos.y, bottomRightY));
@@ -56,6 +73,11 @@ void StepFrame(float elapsedTime) {
 		if (currentBall.pos.y > DISPLAY_HEIGHT-5) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
 		}
+		/*
+		if (currentBall.pos.y < 0){
+			StackArray CurrentScore
+		}
+		*/
 		Play::DrawObject(currentBall);
 		if (willBounce(pad,currentBall)) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
@@ -69,6 +91,7 @@ void StepFrame(float elapsedTime) {
 			if (Play::IsColliding(currentBall, currentBrick)) {
 				Play::DestroyGameObject(currentBrick.GetId());
 				currentBall.velocity.y *= (-1);
+				CurrentScore += 1;
 			
 			}
 			else {
@@ -85,6 +108,8 @@ void StepFrame(float elapsedTime) {
 		updatePaddle(pad, 3.0);
 	}
 	DrawPaddle(pad);
+	HighScores();
+	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 620, DISPLAY_HEIGHT - 320), std::to_string(CurrentScore).c_str());
 }
 
 
