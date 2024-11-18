@@ -24,3 +24,5 @@ void HighScores();
 void ScoreCheck();
 
 void Sort();
+
+void ResetGame();

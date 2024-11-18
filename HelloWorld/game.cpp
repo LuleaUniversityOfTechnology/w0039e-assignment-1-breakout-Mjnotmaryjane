@@ -32,6 +32,7 @@ void Sort() {
 	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
 }
 
+
 //checks current score when game ends. call in stepframe. only checks last item in array.
 void ScoreCheck() {
 	if (CurrentScore > stackArray[4]) {
@@ -63,6 +64,7 @@ void SetUpScene()
 
 
 //function to check for collision between ball and paddle by calculatind delta x and y 
+//make sure topLefy and bottomRightX match DrawPaddle in paddle.cpp tp avoid collision issues
 bool willBounce(const Paddle& paddle, const Play::GameObject& ball) {
 	const float topLeftX = paddle.Pos.x;
 	const float topLeftY = paddle.Pos.y+10;
@@ -73,6 +75,14 @@ bool willBounce(const Paddle& paddle, const Play::GameObject& ball) {
 	return (dx * dx + dy * dy) < (ball.radius*ball.radius);
 }
 
+
+//resets game while remaining inside stepFrame
+void ResetGame() {
+	Play::DestroyAllGameObjects();
+	pad.Pos.x = (DISPLAY_WIDTH / 2);
+	SetUpScene();
+	SpawnBall();
+}
 
 
 //manages objects and their interactions from frame to frame
@@ -96,8 +106,8 @@ void StepFrame(float elapsedTime) {
 		}
 		if (currentBall.pos.y < 0) {
 			ScoreCheck();
+			ResetGame();
 		}
-		
 	}
 	for (int brick : brickIDs) {
 		GameObject& currentBrick = Play::GetGameObject(brick);		
@@ -107,7 +117,6 @@ void StepFrame(float elapsedTime) {
 				Play::DestroyGameObject(currentBrick.GetId());
 				currentBall.velocity.y *= (-1);
 				CurrentScore += 1;
-			
 			}
 			else {
 				Play::DrawObject(currentBrick);
@@ -115,7 +124,6 @@ void StepFrame(float elapsedTime) {
 		}
 		
 	}
-
 	if (Play::KeyDown(Play::KEY_LEFT)) {
 		updatePaddle(pad, -3.0);
 	}
