@@ -11,8 +11,11 @@ Paddle pad;
 //global var for current player score
 unsigned int CurrentScore;
 
+//stack array for high score keeping
+unsigned int stackArray[5] = { 7,3,5,2,6 };
+
+
 void HighScores() {
-	unsigned int stackArray[5] = { 7,3,5,2,6 };
 	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
 	int displayDecrement=260;
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 240), "High Scores: ");
@@ -73,14 +76,16 @@ void StepFrame(float elapsedTime) {
 		if (currentBall.pos.y > DISPLAY_HEIGHT-5) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
 		}
-		/*
-		if (currentBall.pos.y < 0){
-			StackArray CurrentScore
-		}
-		*/
 		Play::DrawObject(currentBall);
 		if (willBounce(pad,currentBall)) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
+		}
+		if (currentBall.pos.y < 0) {
+			for (int i = 0; i < 5; i++) {
+				if (CurrentScore > stackArray[i] && CurrentScore < stackArray[i+1]) {
+					stackArray[i] = CurrentScore;
+				}
+			}
 		}
 		
 	}
