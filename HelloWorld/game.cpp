@@ -12,21 +12,35 @@ Paddle pad;
 unsigned int CurrentScore;
 
 //stack array for high score keeping
-unsigned int stackArray[5] = { 7,3,5,2,6 };
+unsigned int stackArray[5] = { 1,3,5,2,4 };
 
 
+
+//prints list of high scores
 void HighScores() {
-	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
 	int displayDecrement=260;
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 240), "High Scores: ");
 	for (int i = 0; i < 5; i++) {
 		std::string Score = std::to_string(stackArray[i]);
 		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - displayDecrement), Score.c_str());
 		displayDecrement += 20;
-
 	}
-
 }
+
+//sorts the Highscore array. call in gam set up!
+void Sort() {
+	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
+}
+
+//checks current score when game ends. call in stepframe. only checks last item in array.
+void ScoreCheck() {
+	if (CurrentScore > stackArray[4]) {
+		stackArray[4] = CurrentScore;
+		CurrentScore = 0;
+		std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
+	}
+}
+
 
 //creates ball object 
 void SpawnBall() {
@@ -81,11 +95,7 @@ void StepFrame(float elapsedTime) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
 		}
 		if (currentBall.pos.y < 0) {
-			for (int i = 0; i < 5; i++) {
-				if (CurrentScore > stackArray[i] && CurrentScore < stackArray[i+1]) {
-					stackArray[i] = CurrentScore;
-				}
-			}
+			ScoreCheck();
 		}
 		
 	}

@@ -19,3 +19,8 @@ bool willBounce(const Paddle& paddle, const Play::GameObject& ball);
 //Keeps track of high scores in game. 
 //uses stack array.
 void HighScores();
+
+//checks current score against stackArray
+void ScoreCheck();
+
+void Sort();
