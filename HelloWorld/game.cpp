@@ -3,7 +3,9 @@
 #include "Play.h"
 #include "game.h"
 #include "paddle.h"
-#include <algorithm> 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
 
 //global var from Paddle struct
 Paddle pad;
@@ -11,17 +13,22 @@ Paddle pad;
 //global var for current player score
 unsigned int CurrentScore;
 
-//stack array for high score keeping
-unsigned int stackArray[5] = { 1,3,5,2,4 };
+
+//int variable to track dynamic array size.
+unsigned int ScoreSize = 5;
+//Dynamically allocated array for high score keeping
+unsigned int* pHighScores;
 
 
+//File variable for loading and saving
+fstream ScoreFile;
 
 //prints list of high scores
-void HighScores() {
+void HighScoresDraw() {
 	int displayDecrement=260;
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 240), "High Scores: ");
 	for (int i = 0; i < 5; i++) {
-		std::string Score = std::to_string(stackArray[i]);
+		std::string Score = std::to_string(pHighScores[i]);
 		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - displayDecrement), Score.c_str());
 		displayDecrement += 20;
 	}
@@ -29,17 +36,18 @@ void HighScores() {
 
 //sorts the Highscore array. call in gam set up!
 void Sort() {
-	std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
+	std::sort((pHighScores), (pHighScores + ScoreSize), [](int a, int b) {
+		return a > b; });
 }
-
-
+		
 //checks current score when game ends. call in stepframe. only checks last item in array.
 void ScoreCheck() {
-	if (CurrentScore > stackArray[4]) {
-		stackArray[4] = CurrentScore;
-		CurrentScore = 0;
-		std::sort(std::begin(stackArray), std::end(stackArray), std::greater<int>());
+	if (CurrentScore > pHighScores[4]) {
+		pHighScores[4] = CurrentScore;
+		std::sort((pHighScores),(pHighScores + ScoreSize), [](int a, int b) {
+			return a > b; });
 	}
+	CurrentScore = 0;
 }
 
 
@@ -82,6 +90,44 @@ void ResetGame() {
 	pad.Pos.x = (DISPLAY_WIDTH / 2);
 	SetUpScene();
 	SpawnBall();
+}
+
+void FileSave(){
+	ScoreFile.open("Scores.txt", ios::out);
+	if (ScoreFile.is_open()) {
+		for (int i = 0; i < 5; i++) {
+			ScoreFile << pHighScores[i] << endl;
+		}
+		ScoreFile.close();
+	}
+	delete[] pHighScores;
+}
+
+void loadFile(){
+	ScoreFile.open("Scores.txt",ios::in);
+	if (ScoreFile.is_open()) {
+		std::string firstline;
+		int count = 0;
+		while (std::getline(ScoreFile, firstline)) {
+			++count;
+		}
+		ScoreSize = count;
+		ScoreFile.close();
+
+	ScoreFile.open("Scores.txt", ios::in);
+	if (ScoreFile.is_open()) {
+		std::string line;
+		pHighScores = new unsigned int[count];
+		unsigned int score;
+		int i = 0;
+		while (std::getline(ScoreFile, line)) {
+			score = std::stoi(line);
+			pHighScores[i] = score;
+			i++;
+		}
+	}
+	}
+	ScoreFile.close();
 }
 
 
@@ -131,7 +177,7 @@ void StepFrame(float elapsedTime) {
 		updatePaddle(pad, 3.0);
 	}
 	DrawPaddle(pad);
-	HighScores();
+	HighScoresDraw();
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 620, DISPLAY_HEIGHT - 320), std::to_string(CurrentScore).c_str());
 }
 

@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "paddle.h"
 
+
 //creates ball object
 void SpawnBall();
 
@@ -18,7 +19,7 @@ bool willBounce(const Paddle& paddle, const Play::GameObject& ball);
 
 //Keeps track of high scores in game. 
 //uses stack array.
-void HighScores();
+void HighScoresDraw();
 
 //checks current score against stackArray
 void ScoreCheck();
@@ -26,3 +27,8 @@ void ScoreCheck();
 void Sort();
 
 void ResetGame();
+
+void FileSave();
+
+void loadFile();
+
