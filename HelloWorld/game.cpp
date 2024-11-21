@@ -92,6 +92,7 @@ void ResetGame() {
 	SpawnBall();
 }
 
+//saves five highest scores to file "Scores" WILL OVERWRITE FILE!
 void FileSave(){
 	ScoreFile.open("Scores.txt", ios::out);
 	if (ScoreFile.is_open()) {
@@ -103,6 +104,7 @@ void FileSave(){
 	delete[] pHighScores;
 }
 
+//loads file "Scores" into game upon start up. will load all numbers into array to be sorted.
 void loadFile(){
 	ScoreFile.open("Scores.txt",ios::in);
 	if (ScoreFile.is_open()) {
