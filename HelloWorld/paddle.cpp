@@ -2,6 +2,18 @@
 #include "Play.h"
 #include "constants.h"
 
+float Min(float x, float y)
+{
+	
+	return (x < y ? x : y);
+}
+
+float Max(float x, float y)
+{
+	
+	return (x > y ? x : y);
+}
+
 //creates a paddle from the draw rect play.h fucntion.
 void DrawPaddle(const Paddle& paddle) {
 	Play::Point2D bottomLeft = {paddle.Pos.x, paddle.Pos.y };

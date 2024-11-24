@@ -21,9 +21,6 @@ bool willBounce(const Paddle& paddle, const Play::GameObject& ball);
 //uses stack array.
 void HighScoresDraw();
 
-//checks current score against stackArray
-void ScoreCheck();
-
 void Sort();
 
 void ResetGame();
@@ -31,4 +28,6 @@ void ResetGame();
 void FileSave();
 
 void loadFile();
+
+void addScore();
 

@@ -13,17 +13,16 @@ Paddle pad;
 //global var for current player score
 unsigned int CurrentScore;
 
+//global var to track array size
+unsigned int arrSize = 0;
 
-//int variable to track dynamic array size.
-unsigned int ScoreSize = 5;
 //Dynamically allocated array for high score keeping
 unsigned int* pHighScores;
-
 
 //File variable for loading and saving
 fstream ScoreFile;
 
-//prints list of high scores
+//prints list of high scores. set to display 5 but can be adjusted
 void HighScoresDraw() {
 	int displayDecrement=260;
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 240), "High Scores: ");
@@ -34,23 +33,12 @@ void HighScoresDraw() {
 	}
 }
 
-//sorts the Highscore array. call in gam set up!
+//sorts the Highscore array. called in game set up and after each new ball
 void Sort() {
-	std::sort((pHighScores), (pHighScores + ScoreSize), [](int a, int b) {
+	std::sort((pHighScores), (pHighScores + arrSize), [](int a, int b) {
 		return a > b; });
 }
 		
-//checks current score when game ends. call in stepframe. only checks last item in array.
-void ScoreCheck() {
-	if (CurrentScore > pHighScores[4]) {
-		pHighScores[4] = CurrentScore;
-		std::sort((pHighScores),(pHighScores + ScoreSize), [](int a, int b) {
-			return a > b; });
-	}
-	CurrentScore = 0;
-}
-
-
 //creates ball object 
 void SpawnBall() {
 	const int objectID = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH /  2, DISPLAY_HEIGHT-200 }, 4, "ball");
@@ -58,7 +46,7 @@ void SpawnBall() {
 	ball.velocity = normalize({ 1,-1 }) * ballSpeed;
 }
 
-//creates brick objects and lays out obs in game
+//creates brick objects and lays out objs in game
 void SetUpScene()
 {
 	for (int x = 5; x < DISPLAY_WIDTH-20; x+=17) {
@@ -78,8 +66,8 @@ bool willBounce(const Paddle& paddle, const Play::GameObject& ball) {
 	const float topLeftY = paddle.Pos.y+10;
 	const float bottomRightX = paddle.Pos.x+110;
 	const float bottomRightY = paddle.Pos.y;
-	const float dx = ball.pos.x - std::max(topLeftX, std::min(ball.pos.x, bottomRightX));
-	const float dy = ball.pos.y - std::max(topLeftY, std::min(ball.pos.y, bottomRightY));
+	const float dx = ball.pos.x - Max(topLeftX, Min(ball.pos.x, bottomRightX));
+	const float dy = ball.pos.y - Max(topLeftY, Min(ball.pos.y, bottomRightY));
 	return (dx * dx + dy * dy) < (ball.radius*ball.radius);
 }
 
@@ -92,16 +80,18 @@ void ResetGame() {
 	SpawnBall();
 }
 
-//saves five highest scores to file "Scores" WILL OVERWRITE FILE!
+//saves current array to file Scores.txt.
+//will overwrite file but replaced items include old scores due to dynamic array.
 void FileSave(){
 	ScoreFile.open("Scores.txt", ios::out);
 	if (ScoreFile.is_open()) {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < arrSize; i++) {
 			ScoreFile << pHighScores[i] << endl;
 		}
 		ScoreFile.close();
 	}
 	delete[] pHighScores;
+	pHighScores = nullptr;
 }
 
 //loads file "Scores" into game upon start up. will load all numbers into array to be sorted.
@@ -109,17 +99,15 @@ void loadFile(){
 	ScoreFile.open("Scores.txt",ios::in);
 	if (ScoreFile.is_open()) {
 		std::string firstline;
-		int count = 0;
 		while (std::getline(ScoreFile, firstline)) {
-			++count;
+			arrSize++;
 		}
-		ScoreSize = count;
 		ScoreFile.close();
 
 	ScoreFile.open("Scores.txt", ios::in);
 	if (ScoreFile.is_open()) {
 		std::string line;
-		pHighScores = new unsigned int[count];
+		pHighScores = new unsigned int[arrSize];
 		unsigned int score;
 		int i = 0;
 		while (std::getline(ScoreFile, line)) {
@@ -130,6 +118,27 @@ void loadFile(){
 	}
 	}
 	ScoreFile.close();
+}
+
+//creates new array from file and updates scores to be displayed and saved.
+//heavily commented to remember what is being done.
+void addScore() {
+	//creates new dynamically allocated array with pHighscores items + one for new score. 
+	unsigned int* newArr = new unsigned int[arrSize + 1];
+	for (int i = 0; i < arrSize; i++) {
+		newArr[i] = pHighScores[i];
+	}
+	//adds current score to array
+	newArr[arrSize] = CurrentScore;
+	//removes allocated memory.
+	delete[] pHighScores;
+	//redirects pointer to new array.
+	pHighScores = newArr;
+	//nullifies unused pointer.
+	newArr = nullptr;
+	arrSize++;
+	CurrentScore = 0;
+	Sort();
 }
 
 
@@ -153,7 +162,7 @@ void StepFrame(float elapsedTime) {
 			currentBall.velocity.y = currentBall.velocity.y * (-1);
 		}
 		if (currentBall.pos.y < 0) {
-			ScoreCheck();
+			addScore();
 			ResetGame();
 		}
 	}

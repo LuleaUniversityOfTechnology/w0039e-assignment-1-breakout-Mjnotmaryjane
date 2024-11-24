@@ -10,7 +10,9 @@ struct Paddle
 	int height;
 };
 
+float Min(float x, float y);
 
+float Max(float x, float y);
 
 void DrawPaddle(const Paddle& paddle);
 
